@@ -626,8 +626,17 @@ defmodule Logger do
 
   defp form_fa(nil), do: nil
 
-  defp notify(:sync, msg),  do: :gen_event.sync_notify(Logger, msg)
-  defp notify(:async, msg), do: :gen_event.notify(Logger, msg)
+  defp notify(:sync, msg), do: :gen_event.sync_notify(logger(), msg)
+  defp notify(:async, msg), do: :gen_event.notify(logger(), msg)
+
+  defp logger do
+    case :erlang.phash2(self, 4) do
+      0 -> Logger
+      1 -> Logger1
+      2 -> Logger2
+      3 -> Logger3
+    end
+  end
 
   defp handle_unused_variable_warnings(data, caller) do
     # We collect all the names of variables (leaving `data` unchanged) with a

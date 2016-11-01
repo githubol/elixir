@@ -19,7 +19,16 @@ defmodule Logger.App do
                 worker(Logger.Watcher,
                   [:error_logger, Logger.ErrorHandler,
                     {otp_reports?, sasl_reports?, threshold}],
-                  [id: Logger.ErrorHandler, function: :watcher])]
+                  [id: Logger.ErrorHandler, function: :watcher]),
+                worker(:gen_event, [{:local, Logger1}], id: Logger1),
+                worker(Logger.Watcher, [Logger1, Logger.Backends.Console, :console],
+                       [id: :second_console, function: :watcher]),
+              worker(:gen_event, [{:local, Logger2}], id: Logger2),
+                worker(Logger.Watcher, [Logger2, Logger.Backends.Console, :console],
+                       [id: :third_console, function: :watcher]),
+              worker(:gen_event, [{:local, Logger3}], id: Logger3),
+                worker(Logger.Watcher, [Logger3, Logger.Backends.Console, :console],
+                       [id: :fourth_console, function: :watcher])]
 
     config = Logger.Config.new()
 
